@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  api:
+    image: Converter
+    container_name: converter_api
+    build: .
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - ~/.bash_history:/root/.bash_history
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    env_file:
+      - .env
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+  db:
+    image: postgres:15.2
+    container_name: converter_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - .:/app
+    ports:
+      - 5431:5432
+    environment:
+      DATABASE_NAME: ${NAME}
+      DATABASE_USER: ${USER}
+      DATABASE_PASSWORD: ${PASSWORD}
+      DATABASE_HOST: ${HOST}
+      DATABASE_PORT: ${PORT}
+volumes:
+  postgres_data:
