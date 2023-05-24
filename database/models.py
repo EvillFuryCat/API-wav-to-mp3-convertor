@@ -3,7 +3,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import relationship
 import uuid
 
-from .database_config import Base
+from .database_config import Base, engine
 
 
 class User(Base):
@@ -30,3 +30,5 @@ class Audio(Base):
 
     user = relationship("User", primaryjoin="and_(Audio.user_id==User.id, Audio.user_token==User.token)", backref="audio")
 
+
+Base.metadata.create_all(bind=engine)
