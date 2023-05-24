@@ -1,8 +1,8 @@
-version: '2'
+version: '2.5'
 
 services:
   api:
-    image: Converter
+    image: converter
     container_name: converter_api
     build: .
     volumes:
@@ -24,12 +24,12 @@ services:
       - postgres_data:/var/lib/postgresql/data/
       - .:/app
     ports:
-      - 5431:5432
+      - 5434:5432
     environment:
       DATABASE_NAME: ${NAME}
       DATABASE_USER: ${USER}
-      DATABASE_PASSWORD: ${PASSWORD}
-      DATABASE_HOST: ${HOST}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      DATABASE_HOST: localhost
       DATABASE_PORT: ${PORT}
 volumes:
   postgres_data:
