@@ -87,4 +87,7 @@ async def create_audio(user_id: int, user_token: UUID, file: UploadFile) -> Audi
 async def get_upload_record(id: int, user_id: int):
     with SessionLocal() as db:
         audio_file = db.query(Audio).filter(Audio.id == id, Audio.user_id == user_id).first()
+        if audio_file is None:
+            error_message = {"error": "Record not found."}
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_message)
         return FileResponse(path=audio_file.file_path, filename=audio_file.file_name, media_type='multipart/form-data')
