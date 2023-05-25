@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from uuid import UUID, uuid4
+from uuid import UUID
 
 
 class UserBase(BaseModel):
@@ -7,7 +7,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    token: UUID = uuid4
+    token: UUID
 
 
 class AudioCreate(BaseModel):
