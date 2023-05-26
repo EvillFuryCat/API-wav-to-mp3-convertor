@@ -1,23 +1,29 @@
 import os
-from .database.models import Audio
+from tempfile import NamedTemporaryFile
+from fastapi import HTTPException, UploadFile, status
+from pydub import AudioSegment
 
-UPLOADED_FILES_PATH = "audio_file/"
 
-# async def save_file_to_uploads(file, filename):
-#     with open(f'{UPLOADED_FILES_PATH}{filename}', "wb") as uploaded_file:
-#         file_content = await file.read()
-#         uploaded_file.write(file_content)
-#         uploaded_file.close()
-
-# def add_file_to_db(db, **kwargs):
-#     new_file = Audio(
-#                                 file_id=kwargs['file_id'],
-#                                 name=kwargs['full_name'],
-#                                 tag=kwargs['tag'],
-#                                 size=kwargs['file_size'],
-#                                 mime_type=kwargs['file'].content_type,
-#                             )
-#     db.add(new_file)
-#     db.commit()
-#     db.refresh(new_file)
-#     return 
+async def convert_wav_to_mp3(file: UploadFile):
+    try:
+        with NamedTemporaryFile(mode="wb", delete=False, suffix=".wav") as temp_wav_file:
+            temp_wav_file.write(await file.read())
+            # Создание директории, если ее нет
+            os.makedirs("audio_file", exist_ok=True)
+            # Конвертация .wav файла в .mp3 формат
+            sound = AudioSegment.from_file(temp_wav_file.name, format="wav")
+            file_name = f'{file.filename.split(".")[0]}.mp3'
+            mp3_path = f"audio_file/{file_name}"
+            sound.export(mp3_path, format="mp3")
+            # Получаем размер файла
+            file_size = os.path.getsize(mp3_path)
+            
+            result = {"path": mp3_path, "file_name": file_name, "size": file_size}
+            # Удаляем переданный файл формата .wav
+            os.remove(temp_wav_file.name)
+            # Закрываем поток sound
+            sound.close()
+            return result 
+    except (IOError, TypeError, IndexError, Exception) as e:
+        msg = f"Conversion failed: {e}"
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)

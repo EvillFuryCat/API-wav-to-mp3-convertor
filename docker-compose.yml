@@ -11,6 +11,9 @@ services:
       - .:/app
     ports:
       - 8000:8000
+    environment:
+      HOST: ${HOST}
+      PORT: ${PORT}
     depends_on:
       - db
     env_file:
@@ -26,10 +29,10 @@ services:
     ports:
       - 5434:5432
     environment:
-      DATABASE_NAME: ${NAME}
-      DATABASE_USER: ${USER}
-      POSTGRES_PASSWORD: ${PASSWORD}
-      DATABASE_HOST: localhost
-      DATABASE_PORT: ${PORT}
+      DATABASE_NAME: ${DB_NAME}
+      DATABASE_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      DATABASE_HOST: ${DB_HOST}
+      DATABASE_PORT: ${DB_PORT}
 volumes:
   postgres_data:
