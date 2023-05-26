@@ -20,7 +20,9 @@ app = FastAPI(title="converter")
 
 
 @app.post("/users", response_model=UserCreate, status_code=status.HTTP_201_CREATED)
-def create_user(user_name: UserBase = None, db: Session = Depends(get_db)) -> UserCreate:
+def create_user(
+    user_name: UserBase = None, db: Session = Depends(get_db)
+) -> UserCreate:
     try:
         new_user = User(user_name=user_name.user_name)
         db.add(new_user)
@@ -28,14 +30,20 @@ def create_user(user_name: UserBase = None, db: Session = Depends(get_db)) -> Us
         db.refresh(new_user)
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
+        )
 
     return UserCreate(user_name=new_user.user_name, token=new_user.token)
 
 
 @app.post("/record", status_code=status.HTTP_201_CREATED)
 async def create_audio(
-    user_id: int, user_token: UUID, file: UploadFile, response: Response, db: Session = Depends(get_db)
+    user_id: int,
+    user_token: UUID,
+    file: UploadFile,
+    response: Response,
+    db: Session = Depends(get_db),
 ) -> AudioCreate:
     if not (user_id and user_token and file.filename.endswith(".wav")):
         error_message = {"error": "Invalid request parameters."}
