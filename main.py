@@ -20,7 +20,7 @@ app = FastAPI(title="converter")
 
 
 @app.post("/users", response_model=UserCreate, status_code=status.HTTP_201_CREATED)
-def create_user(
+async def create_user(
     user_name: UserBase = None, db: Session = Depends(get_db)
 ) -> UserCreate:
     try:
